@@ -101,13 +101,22 @@ const auth = {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) throw new Error('No active session');
 
+    // Upsert to handle race condition where trigger hasn't fired yet
+    await supabase.from('users').upsert({
+      id: user.id,
+      email: user.email ?? '',
+      first_name: user.user_metadata?.first_name ?? '',
+      last_name: user.user_metadata?.last_name ?? '',
+    }, { onConflict: 'id', ignoreDuplicates: true });
+
     const { data: profile, error: profileError } = await supabase
       .from('users')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (profileError) throw profileError;
+    if (!profile) throw new Error('User profile not found');
 
     return { data: profile as User };
   },
