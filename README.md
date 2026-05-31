@@ -1,6 +1,19 @@
 # 🧬 BioLens - AI Health Report Analyzer
 
+<p align="center">
+  <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80" alt="BioLens Clinical Data Analytics Banner" width="100%" style="border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+</p>
+
 BioLens is an advanced full-stack biotechnology health intelligence platform built as a **Biotech Mini-Project**. It is designed to ingest raw clinical laboratory report scans (PDF, PNG, JPEG) or live camera photographs, binarize and extract their data using a hybrid OCR pipeline, calculate comprehensive health scores, model disease risk probability margins, and provide RAG-grounded AI diagnostic consultations.
+
+---
+
+## 🖥️ Platform Showcase
+
+<p align="center">
+  <img src="frontend/public/dashboard_mockup.png" alt="BioLens Patient Dashboard" width="49%" style="border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+  <img src="frontend/public/ai_assistant_mockup.png" alt="BioLens RAG AI Assistant" width="49%" style="border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
+</p>
 
 ---
 
