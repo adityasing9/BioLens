@@ -1,4 +1,4 @@
-name: BioIntel AI CI/CD Pipeline
+name: BioLens AI CI/CD Pipeline
 
 on:
   push:
