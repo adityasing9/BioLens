@@ -2,13 +2,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
-# Setup engine with robust connection pooling
+# Setup engine with robust connection pooling for Supabase PostgreSQL
 engine = create_engine(
     settings.DATABASE_URL,
-    pool_size=20,
+    pool_size=5,
     max_overflow=10,
     pool_pre_ping=True,
-    pool_recycle=3600
+    pool_recycle=300,
+    connect_args={
+        "options": "-c search_path=biolens,public"
+    }
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

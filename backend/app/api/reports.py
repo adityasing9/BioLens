@@ -46,9 +46,34 @@ def process_report_task(report_id: str, user_id: str):
             patient_gender = user.gender
 
         # Step 1: OCR text extraction
-        from app.services.ocr_engine import extract_text
-        raw_text = extract_text(report.file_path)
-        report.ocr_raw_text = raw_text
+        import tempfile
+        from app.core.supabase_storage import supabase_storage
+        
+        ext = os.path.splitext(report.file_path)[1] or ".pdf"
+        temp_file_path = None
+        try:
+            file_bytes = supabase_storage.download_file(report.file_path)
+            with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as temp_file:
+                temp_file.write(file_bytes)
+                temp_file_path = temp_file.name
+        except Exception as download_error:
+            logger.error(f"Failed to download report {report_id} from Supabase: {download_error}")
+            # Fallback to local file check
+            if os.path.exists(report.file_path):
+                temp_file_path = report.file_path
+            else:
+                raise download_error
+
+        try:
+            from app.services.ocr_engine import extract_text
+            raw_text = extract_text(temp_file_path)
+            report.ocr_raw_text = raw_text
+        finally:
+            if temp_file_path and temp_file_path != report.file_path and os.path.exists(temp_file_path):
+                try:
+                    os.remove(temp_file_path)
+                except Exception as cleanup_error:
+                    logger.warning(f"Failed to clean up temp file {temp_file_path}: {cleanup_error}")
 
         # Step 2: AI-powered parameter parsing via Gemini
         from app.services.gemini_client import parse_report, generate_interpretations, generate_summary
@@ -180,22 +205,25 @@ async def upload_report(
         raise HTTPException(status_code=400, detail=f"File exceeds maximum size of {settings.MAX_FILE_SIZE_MB}MB")
     await file.seek(0)
 
-    # Save file
+    # Save file to Supabase Storage
+    from app.core.supabase_storage import supabase_storage
+    
     report_id = str(uuid4())
     ext = os.path.splitext(file.filename or "upload")[1] or ".pdf"
-    safe_filename = f"{report_id}{ext}"
-    file_path = os.path.join(settings.UPLOAD_DIR, safe_filename)
-    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-
-    with open(file_path, "wb") as f:
-        f.write(contents)
+    storage_path = f"{report_id}{ext}"
+    
+    try:
+        supabase_storage.upload_file(contents, storage_path, file.content_type)
+    except Exception as e:
+        logger.error(f"Failed to upload file to Supabase storage: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to save file to cloud storage: {str(e)}")
 
     # Create report record
     report = Report(
         id=report_id,
         user_id=current_user.id,
         file_name=file.filename or "uploaded_report",
-        file_path=file_path,
+        file_path=storage_path,
         file_type=file.content_type or "application/octet-stream",
         file_size=len(contents),
         upload_status=UploadStatusEnum.PENDING
@@ -277,9 +305,15 @@ async def delete_report(
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
 
-    # Remove physical file
-    if os.path.exists(report.file_path):
-        os.remove(report.file_path)
+    # Remove from Supabase Storage
+    from app.core.supabase_storage import supabase_storage
+    try:
+        supabase_storage.delete_file(report.file_path)
+    except Exception as e:
+        logger.error(f"Failed to delete file from Supabase storage: {e}")
+        # Fallback to local check
+        if os.path.exists(report.file_path):
+            os.remove(report.file_path)
 
     # Audit log
     audit = AuditLog(

@@ -6,8 +6,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "BioLens AI"
     API_V1_STR: str = "/api/v1"
     
-    # Database Settings
-    DATABASE_URL: str = "mysql+pymysql://root:root_secure_pass@localhost:3306/biolens_db"
+    # Database Settings (Supabase PostgreSQL)
+    DATABASE_URL: str = "postgresql+psycopg://postgres:password@localhost:5432/postgres"
     
     # Security Configuration
     JWT_SECRET_KEY: str = "89c3132049e0c7a52e12e84d436cf97920ab4c10cbfb9d6a5789f2db485d41a0"
@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     # AI Provider configurations (OpenRouter takes priority if set)
     GEMINI_API_KEY: str = ""
     OPENROUTER_API_KEY: str = ""
+
+    # Supabase configuration (for file storage)
+    SUPABASE_URL: str = ""
+    SUPABASE_SERVICE_KEY: str = ""
+    SUPABASE_STORAGE_BUCKET: str = "reports"
 
     # File uploads boundaries
     UPLOAD_DIR: str = "uploads"
@@ -32,5 +37,5 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Ensure uploads folder is present
+# Ensure uploads folder is present (used as temp dir for OCR processing)
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)

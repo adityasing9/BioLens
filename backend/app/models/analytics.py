@@ -1,5 +1,6 @@
 import enum
-from sqlalchemy import Column, String, Integer, Enum, TEXT, DECIMAL, TIMESTAMP, ForeignKey, UniqueConstraint, JSON
+from sqlalchemy import Column, String, Integer, Enum, Text, DECIMAL, TIMESTAMP, ForeignKey, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -31,7 +32,7 @@ class HealthScore(Base):
     report_id = Column(String(36), ForeignKey("reports.id", ondelete="CASCADE"), nullable=False, unique=True)
     score = Column(Integer, nullable=False)
     grade = Column(Enum(GradeEnum), nullable=False)
-    factors = Column(JSON, nullable=True) # Factor-weight mappings
+    factors = Column(JSONB, nullable=True) # Factor-weight mappings
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
 
     # Relationships
@@ -47,7 +48,7 @@ class RiskPrediction(Base):
     disease_name = Column(Enum(DiseaseEnum), nullable=False, index=True)
     risk_level = Column(Enum(RiskLevelEnum), nullable=False)
     confidence_percentage = Column(DECIMAL(5, 2), nullable=False)
-    details = Column(TEXT, nullable=True)
+    details = Column(Text, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
 
     # Relationships

@@ -172,25 +172,42 @@ export default function FileUploader({ onUploadSuccess, className }: FileUploade
         });
       }, 200);
 
-      // Trigger FastAPI report upload
+      // Trigger Next.js report upload
       const response = await api.reports.uploadReport(selectedFile);
+      const reportId = response.data?.report_id;
       
       clearInterval(interval);
-      setProgress(100);
+      setProgress(90);
       setUploadState("processing");
 
-      // Mock slightly longer processing screen since OCR and Gemini run in background
-      setTimeout(() => {
-        setUploadState("success");
-        if (onUploadSuccess && response.data?.report_id) {
-          onUploadSuccess(response.data.report_id);
+      if (reportId) {
+        // Trigger report processing and wait
+        const token = localStorage.getItem('access_token');
+        const processRes = await fetch('/api/ai/process-report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ reportId })
+        });
+        
+        if (!processRes.ok) {
+          const errData = await processRes.json();
+          throw new Error(errData.detail || 'Analysis processing failed');
         }
-      }, 2000);
+      }
+
+      setProgress(100);
+      setUploadState("success");
+      if (onUploadSuccess && reportId) {
+        onUploadSuccess(reportId);
+      }
       
     } catch (err: any) {
       setUploadState("error");
       setErrorMessage(
-        err.response?.data?.message || "An error occurred while uploading your medical report. Please try again."
+        err.message || "An error occurred while uploading your medical report. Please try again."
       );
     }
   };

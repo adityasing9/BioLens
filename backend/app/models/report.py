@@ -1,6 +1,5 @@
 import enum
-from sqlalchemy import Column, String, Integer, Enum, TEXT, DECIMAL, TIMESTAMP, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy import Column, String, Integer, Enum, Text, DECIMAL, TIMESTAMP, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -46,8 +45,8 @@ class Report(Base):
     file_type = Column(String(100), nullable=False)
     file_size = Column(Integer, nullable=False)
     upload_status = Column(Enum(UploadStatusEnum), default=UploadStatusEnum.PENDING, nullable=False, index=True)
-    ocr_raw_text = Column(LONGTEXT, nullable=True)
-    ai_summary = Column(TEXT, nullable=True)
+    ocr_raw_text = Column(Text, nullable=True)
+    ai_summary = Column(Text, nullable=True)
     health_score = Column(Integer, nullable=True)
     status_message = Column(String(255), nullable=True)
     uploaded_at = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
@@ -70,7 +69,7 @@ class ReportParameter(Base):
     reference_range_max = Column(DECIMAL(10, 3), nullable=False)
     unit = Column(String(20), nullable=False)
     status = Column(Enum(ParameterStatusEnum), nullable=False, index=True)
-    ai_interpretation = Column(TEXT, nullable=True)
+    ai_interpretation = Column(Text, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp(), nullable=False)
 
     # Relationships
