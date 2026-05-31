@@ -339,7 +339,7 @@ const MOCK_PANELS = {
 };
 
 export default function LandingPage() {
-  const themeKey = "dark";
+  const themeKey = "dark" as "clinical" | "dark" | "colorblind" | "tritanopia" | "contrast";
   const [activePanelKey, setActivePanelKey] = useState<keyof typeof MOCK_PANELS>("lipid");
   
   const theme = THEMES[themeKey];
