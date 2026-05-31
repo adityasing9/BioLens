@@ -49,6 +49,49 @@ BioLens is an advanced full-stack biotechnology health intelligence platform bui
 
 ---
 
+## 🔬 Deep Technical Dive
+
+### A. Hybrid OCR & Image Ingestion Pipeline
+When a user uploads a scan or snaps a photo of a laboratory document, it goes through a multi-stage computer vision cleaning pipeline before text parsing:
+1. **Grayscale Binarization:** OpenCV converts the image to grayscale to discard color noise.
+2. **Gaussian Blurring:** Applies a $5 \times 5$ Gaussian kernel filter to smooth pixel transitions and remove scan noise.
+3. **Adaptive Thresholding:** Uses adaptive Gaussian thresholding (`cv2.ADAPTIVE_THRESH_GAUSSIAN_C`) which calculates local thresholds for $11 \times 11$ neighborhood pixels. This cleans shadows, folds, and highlights dynamically.
+4. **OCR Engine Voting:** The binarized image is parsed by PyTesseract, while EasyOCR processes the original high-resolution scan. A decision-tree merger aligns their extractions, whitelisting clinical biomarker keywords and prioritizing PyTesseract numeric values, falling back to EasyOCR for low-confidence characters.
+
+### B. Weighted Health Index Algorithm
+The Circular Health Score is computed mathematically by evaluating 17 biomarkers against their normal clinical reference bounds $[Ref_{min}, Ref_{max}]$:
+1. **Individual Parameter Score ($S_p$):**
+   * If value is normal: $S_p = 100$
+   * If value is borderline LOW/HIGH: $S_p \in [60, 80]$ (calculated by distance from the normal range center)
+   * If value is far from bounds: $S_p \in [20, 40]$
+   * If value is CRITICAL: $S_p \in [0, 20]$
+2. **Aggregate Health Index Score:**
+   $$\text{Health Score} = \frac{\sum (S_p \times W_p)}{\sum W_p}$$
+   Where $W_p$ is the clinical weight assigned to each biomarker (e.g., Hemoglobin: 8, HbA1c: 8, Creatinine: 6, LDL: 7, TSH: 5, SGPT: 6).
+3. **Clinical Grade Classification:**
+   * $\ge 85$: **EXCELLENT**
+   * $\ge 70$: **GOOD**
+   * $\ge 50$: **MODERATE**
+   * $< 50$: **POOR**
+
+### C. ML Classifier Risk Assessment Models
+BioLens implements rule-based classifiers simulating Scikit-Learn models to predict probability scores:
+* **Diabetes Risk:** Assesses $HbA1c$ ($\ge 6.5\%$ triggers HIGH, $5.7\%-6.4\%$ triggers MEDIUM) and fasting blood glucose levels ($\ge 126\text{ mg/dL}$ triggers HIGH risk).
+* **Anemia Risk:** Evaluates $Hemoglobin$ ($<10.0\text{ g/dL}$ triggers HIGH) and $RBC$ counts (scaled by patient gender/age).
+* **Thyroid Risk:** Monitors $TSH$ ($<0.4$ or $>4.0\text{ \mu IU/mL}$ triggers HIGH) and borderline deviations in $T3$ and $T4$ hormone levels.
+* **Kidney Risk:** Assesses glomerular function through $Creatinine$ ($>1.3\text{ mg/dL}$ triggers HIGH) and $Uric\text{ }Acid$ ($\ge 7.0\text{ mg/dL}$ triggers HIGH).
+* **Liver Risk:** Monitors active enzymes $SGOT$ ($>40\text{ U/L}$) and $SGPT$ ($>40\text{ U/L}$). Double elevations flag HIGH risk margins.
+* **Cardiovascular Risk:** Assesses lipid panels by combining elevated $LDL$ ($>160\text{ mg/dL}$), $Triglycerides$ ($>200\text{ mg/dL}$), $Cholesterol$ ($>240\text{ mg/dL}$), and low protective $HDL$ ($<40\text{ mg/dL}$).
+
+### D. Grounded RAG Chatbot Integration
+The interactive medical AI consultant utilizes a Retrieval-Augmented Generation (RAG) framework:
+1. **Context Construction:** On user message submission, BioLens queries the SQL database for the patient's recent parsed parameters, health scores, risk assessments, and demographics.
+2. **Prompts Grounding:** The Gemini model is initialized with a clinical system instruction block:
+   > *"You are BioLens AI. You explain parsed biomarker trends in simple terms. You must strictly ground your advice using the provided context. You must never diagnose diseases. You must always output the legal medical disclaimer."*
+3. **Safe Inference:** By wrapping the conversation with contextual parameters, the assistant provides highly personalized support without hallucinating standard medical advice.
+
+---
+
 ## 🛠️ Technology Stack
 
 | Layer | Technologies |
