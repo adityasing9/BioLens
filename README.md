@@ -8,6 +8,27 @@ BioLens is an advanced full-stack biotechnology health intelligence platform bui
 
 ---
 
+## 🌐 Live Demo
+
+🚀 Try BioLens Live:
+
+**https://biolens-report.vercel.app/**
+
+### Demo Features
+- Upload Blood Test Reports (PDF/Image)
+- AI-Powered Health Analysis
+- Health Score Calculation
+- Disease Risk Assessment
+- Interactive Health Dashboard
+- AI Health Assistant
+- Historical Biomarker Tracking
+
+> Best experienced on desktop and modern mobile browsers.
+
+
+---
+
+
 ## 🖥️ Platform Showcase
 
 <p align="center">
