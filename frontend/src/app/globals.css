@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-border: var(--border);
+  
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-dark-accent: var(--dark-accent);
+  --color-headings: var(--headings);
+  --color-body-text: var(--body-text);
+  
+  --color-brand-cyan: var(--primary);
+  --color-brand-cyan-hover: var(--primary-hover);
+  --color-brand-purple: var(--dark-accent);
+  --color-brand-success: var(--success);
+  --color-brand-warning: var(--warning);
+  --color-brand-danger: var(--danger);
+}
+
+/* Nordic Midnight Dark Theme (Default & Permanent) */
+:root {
+  --background: #0A1118;
+  --foreground: #8CA7B5;
+  --card: rgba(17, 28, 36, 0.85);
+  --card-hover: rgba(29, 46, 58, 0.95);
+  --primary: #00F2FE;
+  --primary-hover: #2F8CA1;
+  --secondary: #18778C;
+  --accent: #7F00FF;
+  --dark-accent: #18778C;
+  --headings: #E6F0F5;
+  --body-text: #8CA7B5;
+  --border: #1D2E3A;
+  --success: #FF007F;
+  --warning: #FFCC00;
+  --danger: #EF4444;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+/* Glassmorphism Design System (Dynamically themed) */
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.glass-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+  background: var(--card-hover);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(10, 63, 89, 0.04), 0 0 20px rgba(24, 119, 140, 0.02);
+}
+
+/* Animated Grid & Mesh Backgrounds */
+.bg-gradient-mesh {
+  background: radial-gradient(circle at 10% 20%, rgba(171, 207, 214, 0.35) 0%, transparent 60%),
+              radial-gradient(circle at 90% 80%, rgba(47, 140, 161, 0.25) 0%, transparent 60%),
+              var(--background);
+  position: relative;
+  transition: background 0.5s ease;
+}
+
+.bg-gradient-mesh::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(rgba(24, 119, 140, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(24, 119, 140, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Premium Clinical Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 15px rgba(24, 119, 140, 0.05); }
+  50% { box-shadow: 0 0 30px rgba(24, 119, 140, 0.2); }
+}
+
+@keyframes dnaDrift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* DNA Helix 3D Spin Keyframes */
+@keyframes orbit-left {
+  0% { transform: translateX(-50px) scale(0.85); z-index: 10; opacity: 0.9; }
+  25% { transform: translateX(0px) scale(1.15); z-index: 20; opacity: 1; }
+  50% { transform: translateX(50px) scale(0.85); z-index: 10; opacity: 0.9; }
+  75% { transform: translateX(0px) scale(0.6); z-index: 0; opacity: 0.4; }
+  100% { transform: translateX(-50px) scale(0.85); z-index: 10; opacity: 0.9; }
+}
+
+@keyframes orbit-right {
+  0% { transform: translateX(50px) scale(0.85); z-index: 10; opacity: 0.9; }
+  25% { transform: translateX(0px) scale(0.6); z-index: 0; opacity: 0.4; }
+  50% { transform: translateX(-50px) scale(0.85); z-index: 10; opacity: 0.9; }
+  75% { transform: translateX(0px) scale(1.15); z-index: 20; opacity: 1; }
+  100% { transform: translateX(50px) scale(0.85); z-index: 10; opacity: 0.9; }
+}
+
+@keyframes scale-bar {
+  0%, 50%, 100% { transform: scaleX(1); opacity: 0.6; }
+  25%, 75% { transform: scaleX(0); opacity: 0.15; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s infinite ease-in-out;
+}
+
+.animate-dna-drift {
+  animation: dnaDrift 6s infinite ease-in-out;
+}
+
+.animate-pulse-dot {
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+/* 3D DNA Animation Helpers */
+.animate-orbit-left {
+  animation: orbit-left 3.5s infinite linear;
+}
+
+.animate-orbit-right {
+  animation: orbit-right 3.5s infinite linear;
+}
+
+.animate-scale-bar {
+  animation: scale-bar 3.5s infinite linear;
+}
+
+/* Styled typography utilities */
+.font-outfit {
+  font-family: 'Outfit', var(--font-outfit), sans-serif;
+}
+
+/* Live Camera Laser Scanning Animation */
+@keyframes scan-laser {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+.animate-scan-laser {
+  animation: scan-laser 3s infinite ease-in-out;
+}
+
