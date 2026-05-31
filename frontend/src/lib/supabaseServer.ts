@@ -8,9 +8,6 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) 
 }
 
 export const supabaseServer = createClient(supabaseUrl, supabaseServiceKey, {
-  db: {
-    schema: 'biolens',
-  },
   auth: {
     persistSession: false,
     autoRefreshToken: false,
