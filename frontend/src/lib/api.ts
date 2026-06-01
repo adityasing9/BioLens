@@ -112,6 +112,10 @@ const auth = {
       email: user.email ?? '',
       first_name: user.user_metadata?.first_name ?? '',
       last_name: user.user_metadata?.last_name ?? '',
+      date_of_birth: user.user_metadata?.date_of_birth ?? null,
+      gender: user.user_metadata?.gender ?? null,
+      phone_number: user.user_metadata?.phone_number ?? '',
+      is_active: true,
     }, { onConflict: 'id', ignoreDuplicates: true });
 
     const { data: profile, error: profileError } = await supabase
