@@ -118,16 +118,29 @@ const auth = {
     }
 
     if (!existingProfile) {
-      const { error: profileCreateError } = await supabase.from('users').insert({
+      const profileData: Record<string, any> = {
         id: user.id,
         email: user.email ?? '',
-        first_name: user.user_metadata?.first_name ?? '',
-        last_name: user.user_metadata?.last_name ?? '',
-        date_of_birth: user.user_metadata?.date_of_birth ?? undefined,
-        gender: user.user_metadata?.gender ?? undefined,
-        phone_number: user.user_metadata?.phone_number ?? '',
         is_active: true,
-      });
+      };
+
+      if (user.user_metadata?.first_name) {
+        profileData.first_name = user.user_metadata.first_name;
+      }
+      if (user.user_metadata?.last_name) {
+        profileData.last_name = user.user_metadata.last_name;
+      }
+      if (user.user_metadata?.date_of_birth) {
+        profileData.date_of_birth = user.user_metadata.date_of_birth;
+      }
+      if (user.user_metadata?.gender) {
+        profileData.gender = user.user_metadata.gender;
+      }
+      if (user.user_metadata?.phone_number) {
+        profileData.phone_number = user.user_metadata.phone_number;
+      }
+
+      const { error: profileCreateError } = await supabase.from('users').insert(profileData);
 
       if (profileCreateError) {
         throw new Error(profileCreateError.message || 'Failed to create user profile');
