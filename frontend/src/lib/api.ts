@@ -35,7 +35,10 @@ const auth = {
     });
 
     if (signUpError) throw signUpError;
-    
+    if (!authData.user) {
+      throw new Error('Registration completed, but the account may require email confirmation before login.');
+    }
+
     return {
       data: {
         id: authData.user?.id || '',
@@ -61,17 +64,19 @@ const auth = {
     if (signInError) throw signInError;
 
     const session = authData.session;
-    if (session) {
-      localStorage.setItem('access_token', session.access_token);
-      localStorage.setItem('refresh_token', session.refresh_token || '');
+    if (!session) {
+      throw new Error('Login completed, but no session was returned. Please verify your credentials or email confirmation settings.');
     }
+
+    localStorage.setItem('access_token', session.access_token);
+    localStorage.setItem('refresh_token', session.refresh_token || '');
 
     return {
       data: {
-        access_token: session?.access_token || '',
-        refresh_token: session?.refresh_token || '',
+        access_token: session.access_token,
+        refresh_token: session.refresh_token || '',
         token_type: 'bearer',
-        expires_in: session?.expires_in || 3600,
+        expires_in: session.expires_in || 3600,
       } as TokenResponse
     };
   },

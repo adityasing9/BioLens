@@ -39,7 +39,7 @@ export default function LoginPage() {
       localStorage.setItem("user_first_name", user.first_name);
       localStorage.setItem("user_last_name", user.last_name);
       localStorage.setItem("user_email", user.email);
-      
+
       // Determine if user has admin profiles
       const isAdminUser = user.email === "admin@biolens.ai" || !!user.admin_profile;
       localStorage.setItem("is_admin", String(isAdminUser));
@@ -47,8 +47,12 @@ export default function LoginPage() {
       // 3. Redirect to overview dashboard
       router.push("/dashboard");
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(
-        err.response?.data?.message || "Invalid email or password combination. Please try again."
+        err?.message ||
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        "Invalid email or password combination. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -71,7 +75,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-mesh flex items-center justify-center p-6 relative font-sans">
       {/* Glow Effects */}
       <div className="absolute top-1/4 left-1/3 h-[250px] w-[250px] rounded-full bg-brand-cyan/5 blur-[80px] pointer-events-none" />
-      
+
       <div className="w-full max-w-md animate-fade-in">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-8">

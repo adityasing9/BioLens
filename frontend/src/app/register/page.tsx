@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("MALE");
   const [phoneNumber, setPhoneNumber] = useState("");
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -45,7 +45,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Trigger FastAPI auth registration
+      // Trigger Supabase auth registration
       await api.auth.register({
         email,
         password,
@@ -57,12 +57,12 @@ export default function RegisterPage() {
       });
 
       setSuccess("Account created successfully! Redirecting to login portal...");
-      
+
       // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push("/login");
       }, 2000);
-      
+
     } catch (err: any) {
       setError(
         err.response?.data?.detail || err.response?.data?.message || "Registration failed. Please verify your details."
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1">
                 <label htmlFor="last_name" className="text-xs font-semibold text-zinc-400">
                   Last Name *
