@@ -106,17 +106,33 @@ const auth = {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) throw new Error('No active session');
 
-    // Upsert to handle race condition where trigger hasn't fired yet
-    await supabase.from('users').upsert({
-      id: user.id,
-      email: user.email ?? '',
-      first_name: user.user_metadata?.first_name ?? '',
-      last_name: user.user_metadata?.last_name ?? '',
-      date_of_birth: user.user_metadata?.date_of_birth ?? null,
-      gender: user.user_metadata?.gender ?? null,
-      phone_number: user.user_metadata?.phone_number ?? '',
-      is_active: true,
-    }, { onConflict: 'id', ignoreDuplicates: true });
+    // Ensure the profile row exists before reading it.
+    const { data: existingProfile, error: existingError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (existingError) {
+      throw new Error(existingError.message || 'Failed to verify user profile');
+    }
+
+    if (!existingProfile) {
+      const { error: profileCreateError } = await supabase.from('users').insert({
+        id: user.id,
+        email: user.email ?? '',
+        first_name: user.user_metadata?.first_name ?? '',
+        last_name: user.user_metadata?.last_name ?? '',
+        date_of_birth: user.user_metadata?.date_of_birth ?? undefined,
+        gender: user.user_metadata?.gender ?? undefined,
+        phone_number: user.user_metadata?.phone_number ?? '',
+        is_active: true,
+      });
+
+      if (profileCreateError) {
+        throw new Error(profileCreateError.message || 'Failed to create user profile');
+      }
+    }
 
     const { data: profile, error: profileError } = await supabase
       .from('users')
